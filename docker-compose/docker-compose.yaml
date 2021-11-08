@@ -18,9 +18,11 @@ services:
   caddy:
     container_name: caddy
     image: 'index.docker.io/caddy/caddy:alpine@sha256:83d9aa7a5f1bbcc0fc1b4720c183a5ec53dae7dc5d9fa555daf3db345010e7f9'
-    cpus: 4
+    cpus: 2
     mem_limit: '4g'
     environment:
+      - 'VIRTUAL_HOST=sourcegraph'
+      - 'VIRTUAL_PORT=80'
       - 'XDG_DATA_HOME=/caddy-storage/data'
       - 'XDG_CONFIG_HOME=/caddy-storage/config'
       - 'SRC_FRONTEND_ADDRESSES=sourcegraph-frontend-0:3080'
@@ -50,9 +52,9 @@ services:
       #
       # Uncomment / update the following line when using HTTPS with custom certificates
       # - '/LOCAL/KEY/PATH.key:/sourcegraph.key'
-    ports:
-      - '0.0.0.0:80:80'
-      - '0.0.0.0:443:443'
+    expose:
+      - '80'
+      - '443'
     networks:
       - sourcegraph
     restart: always
@@ -70,7 +72,7 @@ services:
   sourcegraph-frontend-0:
     container_name: sourcegraph-frontend-0
     image: 'index.docker.io/sourcegraph/frontend:insiders@sha256:7c453e79a63e92b79901a6b523859d43e870f978162a60a4b219a6e54aa6c98a'
-    cpus: 4
+    cpus: 2
     mem_limit: '8g'
     environment:
       - DEPLOY_TYPE=docker-compose
@@ -114,7 +116,7 @@ services:
   sourcegraph-frontend-internal:
     container_name: sourcegraph-frontend-internal
     image: 'index.docker.io/sourcegraph/frontend:insiders@sha256:7c453e79a63e92b79901a6b523859d43e870f978162a60a4b219a6e54aa6c98a'
-    cpus: 4
+    cpus: 2
     mem_limit: '8g'
     environment:
       - DEPLOY_TYPE=docker-compose
@@ -160,7 +162,7 @@ services:
   gitserver-0:
     container_name: gitserver-0
     image: 'index.docker.io/sourcegraph/gitserver:insiders@sha256:4f67f43a5bbefef5829da08be8f96235935d048218a22b96dd9f8af6f7fe7256'
-    cpus: 4
+    cpus: 2
     mem_limit: '8g'
     environment:
       - GOMAXPROCS=4
@@ -321,7 +323,7 @@ services:
   repo-updater:
     container_name: repo-updater
     image: 'index.docker.io/sourcegraph/repo-updater:insiders@sha256:3d98205ae2f4585bdb6a8c7d99b15542187689fd3608e197c9f2e0afc5e496c9'
-    cpus: 4
+    cpus: 2
     mem_limit: '4g'
     environment:
       - GOMAXPROCS=1
@@ -343,7 +345,7 @@ services:
   worker:
     container_name: worker
     image: 'index.docker.io/sourcegraph/worker:insiders@sha256:f8bab666696183f69208bef489c5ffa0531fcb40f696db9ce6ed98926827f08c'
-    cpus: 4
+    cpus: 2
     mem_limit: '4g'
     environment:
       - GOMAXPROCS=1
@@ -364,7 +366,7 @@ services:
   syntect-server:
     container_name: syntect-server
     image: 'index.docker.io/sourcegraph/syntax-highlighter:insiders@sha256:98e85074ae6e0a6c1386d66e8a96c6568c416fd6206c9791d5cc0c4a5849af7e'
-    cpus: 4
+    cpus: 2
     mem_limit: '6g'
     healthcheck:
       test: "wget -q 'http://127.0.0.1:9238/health' -O /dev/null || exit 1"
@@ -412,7 +414,7 @@ services:
   prometheus:
     container_name: prometheus
     image: 'index.docker.io/sourcegraph/prometheus:insiders@sha256:7deb73094bd07c7d7940c6c8c8f743b510e52271158b30306174551af64ccbc0'
-    cpus: 4
+    cpus: 2
     mem_limit: '8g'
     volumes:
       - 'prometheus-v2:/prometheus'
@@ -514,7 +516,7 @@ services:
   pgsql:
     container_name: pgsql
     image: 'index.docker.io/sourcegraph/postgres-12.6-alpine:insiders@sha256:695eaa5070a879863597b077c610129685a7ab4e8ac0039864b7aad3dfc5cf5b'
-    cpus: 4
+    cpus: 2
     mem_limit: '2g'
     healthcheck:
       test: '/liveness.sh'
@@ -539,7 +541,7 @@ services:
   codeintel-db:
     container_name: codeintel-db
     image: 'index.docker.io/sourcegraph/codeintel-db:insiders@sha256:a525705803fc787d20aed15e74c739bbfb77eed4351cbb6d1a46edc89877319b'
-    cpus: 4
+    cpus: 2
     mem_limit: '2g'
     healthcheck:
       test: '/liveness.sh'
@@ -568,7 +570,7 @@ services:
   codeinsights-db:
     container_name: codeinsights-db
     image: "index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:56596dff34785b950fe69bcf051cbd2b7cd47fbc8d9733e8fd8af180047cdcb8"
-    cpus: 4
+    cpus: 2
     mem_limit: "2g"
     environment:
       - POSTGRES_PASSWORD=password
